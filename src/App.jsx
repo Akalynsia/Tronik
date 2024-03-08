@@ -243,12 +243,43 @@ export default function App() {
     };
   }, [synthKeys]);
 
+  const handleMouseDown = (key) => {
+    setSynthKeys((prevKeys) =>
+      prevKeys.map((prevKey) =>
+        prevKey === key ? { ...prevKey, active: true } : prevKey
+      )
+    );
+    playNote(`./sounds/${currentInstrument}/${key.keyName}.mp3`);
+  };
+
+  const handleMouseUp = (key) => {
+    setSynthKeys((prevKeys) =>
+      prevKeys.map((prevKey) =>
+        prevKey === key ? { ...prevKey, active: false } : prevKey
+      )
+    );
+  };
+
+  function playNote(note) {
+    let audio = new Audio(note);
+    audio.volume = volume / 100;
+    audio.playbackRate =
+      playbackRate <= 10 ? playbackRate / 10 : playbackRate - 9;
+    audio.loop = loop;
+    audio.play();
+    loop && setLoopingNotes([...loopingNotes, audio]);
+  }
+
   return (
     <div className="wrapper">
       <div className="main-container">
         <Settings {...propsBundle} />
-
-        <Keys showKeys={showKeys} synthKeys={synthKeys} />
+        <Keys
+          showKeys={showKeys}
+          synthKeys={synthKeys}
+          onMouseDown={handleMouseDown}
+          onMouseUp={handleMouseUp}
+        />
       </div>
     </div>
   );
